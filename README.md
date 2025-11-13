@@ -83,4 +83,26 @@ The system is built around an **ESP32-S3**, uses two DS18B20 temperature sensors
 ---
 
 ## 🧩 System Architecture
+ESP32-S3
+│
+├── BLE FTMS (speed/cadence) ← Smart Trainer (e.g. Tacx Flux)
+│
+├── DS18B20 #1 (room temperature)
+├── DS18B20 #2 (heatsink temperature)
+│
+└── PWM 25 kHz → MOSFET → Fan
+│
+└── SiC freewheel diode (high-voltage spike protection)
 
+---
+
+## 📐 Software Architecture
+
+- **C++17**
+- **PlatformIO**
+- **FreeRTOS Tasks**
+- **NimBLE for BLE FTMS**
+- Custom DS18B20 bus manager with mutex-safe access
+- Configurable parameters in `Config.hpp`
+
+---
