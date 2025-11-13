@@ -1,88 +1,86 @@
 # Smart Trainer Fan Controller – ESP32-S3 (FTMS / DS18B20 / High-Power PWM)
 
-Dieses Projekt ist ein intelligenter, leistungsstarker Lüfter-Controller für Rollentrainer (z. B. Tacx Flux), der die Geschwindigkeit über **Bluetooth FTMS** ausliest und damit einen oder mehrere Hochleistungslüfter regelt.  
-Die Steuerung basiert auf einem **ESP32-S3**, misst Temperaturen mit zwei DS18B20-Sensoren und treibt große 12-V-Lüfter mit MOSFET-PWM an.
+This project is a high-performance, intelligent fan controller for smart bike trainers (e.g., Tacx Flux).  
+It reads **speed/cadence via Bluetooth FTMS** and controls one or more powerful 12-V fans using PWM.  
+The system is built around an **ESP32-S3**, uses two DS18B20 temperature sensors, and drives high-current fans using a MOSFET power stage.
 
 ---
 
-## 🚴‍♂️ Funktionsumfang (Aktueller Stand)
+## 🚴‍♂️ Current Features
 
-- Liest **Indoor Bike Data** via **BLE FTMS** (Geschwindigkeit / Kadenz)
-- Berechnet eine dynamische Lüfterregelung abhängig von:
-  - Geschwindigkeit (km/h)
-  - Temperatur im Raum
-  - Temperatur am Lüfter (Heatsink)
-  - Benutzerparametern (Potentiometer „alpha“)
-- Temperaturmessung über **2× DS18B20**:
-  - **Room Sensor** – Umgebungstemperatur
-  - **Fan Sensor** – Temperatur am MOSFET-Kühlkörper
-- Komfortregelung mit Sicherheitsgrenzen:
-  - Ab Soft-Limit → Leistung reduziert
-  - Ab Hard-Limit → Lüfter abgeschaltet
-- PWM-Ansteuerung: **25 kHz**, **10-Bit Auflösung**
-- Stabile, FreeRTOS-basierte Architektur mit drei Tasks:
-  - **BLE Task**
-  - **Control Task**
-  - **Telemetry Task**
-- Ausgabe aller Messwerte über Serial-Telemetrie
+- Reads **Indoor Bike Data** via **BLE FTMS**
+- Dynamic fan control based on:
+  - Trainer speed (km/h)
+  - Room temperature (DS18B20 #1)
+  - Heatsink temperature at the MOSFET / fan assembly (DS18B20 #2)
+  - User control via potentiometer ("alpha")
+- Safety-aware thermal control:
+  - **Soft limit:** reduce fan output gradually  
+  - **Hard limit:** immediately shut down fans
+- High sampling frequency: control loop every 20 ms
+- Smooth PWM control at **25 kHz**, **10-bit resolution**
+- FreeRTOS-based software architecture:
+  - BLE Task  
+  - Control Task  
+  - Telemetry Task
+- Serial telemetry output (speed, temperatures, alpha, duty, etc.)
 
 ---
 
-## 🛠️ Geplante Erweiterungen (Coming Soon)
+## 🛠️ Planned Features (Coming Soon)
 
-- **leistungsabhängige Lüfterregelung**  
-  z. B. abhängig von realer Leistung (Watt), statt nur Geschwindigkeit
+- **Power-based fan control**  
+  Instead of speed only, future versions will use trainer watt output.
 
-- **Kadenzabhängige RGB-LED-Anzeige**  
-  - Grün → z. B. „optimale Kadenz“ (80 rpm)  
-  - Gelb → Warnbereich  
-  - Rot → „über Zielbereich“ (95 rpm oder mehr)  
-  - LED-Bar oder RGB-Ring  
-  - Vollständig konfigurierbar
+- **Cadence-dependent RGB LED indicator**
+  - Green → optimal cadence (e.g., 80 rpm)
+  - Yellow → moderate zone
+  - Red → above threshold (e.g., 95 rpm)
+  - Fully configurable ranges
+  - Based on WS2812 or similar
 
-- Web-UI (optional) zur Echtzeitkonfiguration (Alpha, Limits, LED-Zonen)
+- Optional Web-UI configuration (alpha, thresholds, LED zones, fan curves)
 
 ---
 
-## 🔧 Hardware
+## 🔧 Hardware Overview
 
-### **Mikrocontroller**
+### **Microcontroller**
 - **ESP32-S3**
-  - BLE 5.0 (NimBLE)
-  - FreeRTOS
-  - PWM über LEDC (25 kHz)
+  - BLE 5 (NimBLE)
+  - FreeRTOS multitasking
+  - LEDC PWM (25 kHz)
 
-### **Temperatursensoren**
+### **Temperature Sensors**
 - **2× DS18B20**
-  - Auf demselben OneWire-Bus
-  - Messen:
-    - Raumtemperatur
-    - Lüfter-/Heatsink-Temperatur
+  - On the same OneWire bus
+  - **Room Sensor** → measures ambient temperature  
+  - **Fan/Heatsink Sensor** → mounted on the MOSFET heatsink
 
-### **Stromversorgung**
-- **12 V Schaltnetzteil, 30 A**  
-  Leistungsreserve für kräftige Lüfter (~80 W)
+### **Power Supply**
+- **12 V / 30 A SMPS**
+  - Provides enough power for high-performance fans (~80 W)
 
-### **Leistungs-PWM Stufe**
-- **MOSFET:** *Infineon IPA040N06NM5SXKSA1*  
-  - Rds_on extrem niedrig  
-  - Auf großem Kühlkörper montiert (2,60 °C/W)
+### **PWM Power Stage**
+- **MOSFET:** *Infineon IPA040N06NM5SXKSA1*
+  - Very low Rds_on
+  - Mounted on a large heatsink (2.60 °C/W)
 
-- **Freilaufdiode:**  
-  **Wolfspeed SiC Dual-Schottkydiode (1200 V, 43 A, TO-247)**  
-  - Praktisch unzerstörbar  
-  - Extrem schnelle Recovery  
-  - Wird nur leicht warm  
-  - Schutz gegen hohe Induktionsspannungen bei kleinen Duty Cycles
+- **Freewheeling Diode:**  
+  **Wolfspeed SiC Dual Schottky Diode (1200 V, 43 A, TO-247)**  
+  - Handles extremely high inductive kickback  
+  - Essential at low PWM duty cycles  
+  - Runs only mildly warm during operation  
+  - Virtually indestructible
 
-- **PWM:**  
-  - 25 kHz (lüfterfreundlich, nicht hörbar)  
-  - 10-Bit Resolution
+- **PWM Specs**
+  - 25 kHz switching frequency (inaudible)
+  - 10-bit resolution
 
-### **Anschlüsse**
-- **SP17 3-Pin Stecker** für Lüfter (robust, verriegelbar)
+### **Connectors**
+- **SP17 3-pin waterproof connector** for the fan output
 
 ---
 
-## 🔌 Schaltungskonzept (Kurzfassung)
+## 🧩 System Architecture
 
