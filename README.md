@@ -12,12 +12,12 @@ The system is built around an **ESP32-S3**, uses two DS18B20 temperature sensors
 - Dynamic fan control based on:
   - Trainer speed (km/h)
   - Room temperature (DS18B20 #1)
-  - Heatsink temperature at the MOSFET / fan assembly (DS18B20 #2)
+  - Heatsink temperature at the fan assembly (DS18B20 #2)
   - User control via potentiometer ("alpha")
 - Safety-aware thermal control:
   - **Soft limit:** reduce fan output gradually  
   - **Hard limit:** immediately shut down fans
-- High sampling frequency: control loop every 20 ms
+- High sampling frequency: control loop every  1.25s
 - Smooth PWM control at **25 kHz**, **10-bit resolution**
 - FreeRTOS-based software architecture:
   - BLE Task  
