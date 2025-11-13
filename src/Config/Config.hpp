@@ -3,14 +3,13 @@
 #include <cmath>
 #include <algorithm>
 
-namespace cfg {
-  // ==== Pins ====
-  constexpr int kPinFanPwm  = 25;  
-  constexpr int kPinDsRoom  = 4;   
-  constexpr int kPinDsFan   = 15;  
-  constexpr int kPinPotAdc  = 35;  
-  constexpr uint32_t kPwmFreqHz  = 30'000;
-  constexpr uint8_t  kPwmBits    = 11;
+namespace cfg 
+{
+  constexpr int kPinFanPwm  = 48;  
+  constexpr int kPinDsRoom  = 15;    
+  constexpr int kPinPotAdc  = 10;  
+  constexpr uint32_t kPwmFreqHz  = 25'000;
+  constexpr uint8_t  kPwmBits    = 10;
   constexpr int      kPwmChannel = 0;
   constexpr int      kPwmTimer   = 0;
 
@@ -32,6 +31,6 @@ namespace cfg {
 
   inline constexpr const char* kFtmsServiceUuid = "00001826-0000-1000-8000-00805f9b34fb";
   inline constexpr const char* kIndoorBikeChar  = "00002ad2-0000-1000-8000-00805f9b34fb";
-  inline constexpr const char* kNameHint        = "Tacx"; // optional device name hint
+  inline constexpr const char* kNameHint        = "Tacx Flux 27743";
   constexpr uint32_t kSpeedTimeoutMs = 5'000;
 }

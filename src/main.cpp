@@ -16,13 +16,11 @@ namespace
   BLEBikeFTMS bike;
   AdcInput pot{cfg::kPinPotAdc, cfg::kAdcSamples};
 
-  // TODO: echte Adressen deiner Sensoren eintragen (8 Byte pro Sensor)
-  DeviceAddress ROOM_ADDR = {0x28, 0xFF, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66};
-  DeviceAddress FAN_ADDR = {0x28, 0xFF, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0x01};
-
+  DeviceAddress ROOM_ADDR = {0x28, 0xFF, 0x64, 0x1F, 0x71, 0x8E, 0xC0, 0x99};
+  DeviceAddress FAN_ADDR = {0x28, 0xFF, 0x64, 0x1F, 0x7F, 0xDB, 0x18, 0x70};
 
   DS18B20Sensor roomSensor(cfg::kPinDsRoom, ROOM_ADDR);
-  DS18B20Sensor fanSensor(cfg::kPinDsFan, FAN_ADDR);
+  DS18B20Sensor fanSensor(cfg::kPinDsRoom, FAN_ADDR);
 
   SemaphoreHandle_t mtx;
   float speedKmh = 0.0f;
@@ -33,11 +31,12 @@ namespace
   void taskBLE(void *)
   {
     bike.onSpeed([](float kmh)
-                 {
+   {
       xSemaphoreTake(mtx, portMAX_DELAY);
       speedKmh   = kmh;
       lastSpeedMs = millis();
-      xSemaphoreGive(mtx); });
+      xSemaphoreGive(mtx); 
+    });
     bike.begin(cfg::kFtmsServiceUuid, cfg::kIndoorBikeChar, cfg::kNameHint);
     for (;;)
     {
@@ -51,27 +50,21 @@ namespace
     ComfortControl comfort{};
     for (;;)
     {
-      // aktuelle Bike-Speed (mit Timeout auf 0)
       float v = 0.0f;
       uint32_t t = 0;
       xSemaphoreTake(mtx, portMAX_DELAY);
       v = speedKmh;
       t = lastSpeedMs;
       xSemaphoreGive(mtx);
+
       if (millis() - t > cfg::kSpeedTimeoutMs)
         v = 0.0f;
 
-      // α vom Poti
       const float alpha = cfg::kAlphaMin + (cfg::kAlphaMax - cfg::kAlphaMin) * pot.read01();
-
-      // Temperaturen (blockierend, simpel)
       const float tRoom = roomSensor.readTemperature();
       const float tFan = fanSensor.readTemperature();
-
-      // PWM aus Komfort + Mapping
       float duty = comfort.computeDuty(v, alpha, tRoom, tFan);
 
-      // Elektronik-Schutz
       if (!std::isnan(tFan))
       {
         if (tFan >= cfg::kTempHardC)
@@ -86,7 +79,7 @@ namespace
       }
 
       fan.setDuty(duty);
-      vTaskDelay(pdMS_TO_TICKS(20)); // 50 Hz Regel-Loop
+      vTaskDelay(pdMS_TO_TICKS(20));
     }
   }
 
@@ -102,7 +95,6 @@ namespace
       xSemaphoreGive(mtx);
 
       const float alpha = cfg::kAlphaMin + (cfg::kAlphaMax - cfg::kAlphaMin) * pot.read01();
-
       const float tRoom = roomSensor.readTemperature();
       const float tFan = fanSensor.readTemperature();
 

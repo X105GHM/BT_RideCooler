@@ -5,16 +5,14 @@ static inline float clampf(float v, float lo, float hi) { return v < lo ? lo : (
 
 float ComfortControl::computeDuty(float speedKmh, float alpha, float tRoomC, float /*tFanC*/) const
 {
-    // Rule 1: If speed >= 38 km/h → full blast
+    //speed >= 38 km/h --> full blast
     if (speedKmh >= cfg::kSpeedBlowKmh)
         return 1.0f;
 
-    // Base mapping: avoid early full-scale.
-    // duty_base = min(0.95, (alpha * v_bike) / V_ref), with V_ref = 45 km/h
+    // duty_base = min(0.95, (alpha * v_bike) / V_ref), mit V_ref = 45 km/h
     constexpr float VrefKmh = 45.0f;
     float duty = std::min(0.95f, (alpha * speedKmh) / VrefKmh);
 
-    // Temperature comfort scaling: keep within comfort band
     float scale = 1.0f;
     if (!std::isnan(tRoomC))
     {
