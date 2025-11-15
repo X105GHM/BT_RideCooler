@@ -106,3 +106,20 @@ ESP32-S3
 - Configurable parameters in `Config.hpp`
 
 ---
+
+## 📸 Images & Hardware Photos
+
+### Hardware Gallery
+
+<img src="https://raw.githubusercontent.com/X105GHM/BT_RideCooler/pic/IMG_3524.jpg" width="600"/>
+<img src="https://raw.githubusercontent.com/X105GHM/BT_RideCooler/pic/IMG_3525.jpg" width="600"/>
+<img src="https://raw.githubusercontent.com/X105GHM/BT_RideCooler/pic/IMG_3526.jpg" width="600"/>
+<img src="https://raw.githubusercontent.com/X105GHM/BT_RideCooler/pic/IMG_3527.jpg" width="600"/>
+<img src="https://raw.githubusercontent.com/X105GHM/BT_RideCooler/pic/IMG_3528.jpg" width="600"/>
+<img src="https://raw.githubusercontent.com/X105GHM/BT_RideCooler/pic/IMG_3529.jpg" width="600"/>
+<img src="https://raw.githubusercontent.com/X105GHM/BT_RideCooler/pic/IMG_3530.jpg" width="600"/>
+<img src="https://raw.githubusercontent.com/X105GHM/BT_RideCooler/pic/IMG_3531.jpg" width="600"/>
+<img src="https://raw.githubusercontent.com/X105GHM/BT_RideCooler/pic/IMG_3532.jpg" width="600"/>
+<img src="https://raw.githubusercontent.com/X105GHM/BT_RideCooler/pic/IMG_3533.jpg" width="600"/>
+
+---
